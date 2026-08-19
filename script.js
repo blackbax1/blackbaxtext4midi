@@ -52,18 +52,17 @@
   // width (column spacing). "Tiny" / "Dense" / "Narrow" reproduce the
   // original 1px-per-cell look exactly.
   //
-  // Every "on" pixel of the 5x7 font is blown up into an NxN solid block
-  // of grid cells (both in pitch/row and in time/col), so Bold letters
-  // end up both taller (more semitones tall in the piano roll) and
-  // thicker-stroked.
-  //
-  // Row (pitch) and column (time) are scaled independently: Bold gets an
-  // extra 1.5x stretch on columns only, on top of the normal weight
-  // scale, so its notes read as long/filled ("bold") in the piano roll
-  // without making the letter taller than it needs to be.
+  // Every "on" pixel of the 5x7 font is blown up into a block of grid
+  // cells: tall in pitch/row (rowScale, driven by weight), but always
+  // just 1 column wide in time. In a piano roll, one time-column already
+  // renders far wider on screen than one semitone-row is tall (pitch has
+  // ~127 rows to fit on screen; time is comfortably spaced out), so
+  // stretching columns further only flattens the letters into thin,
+  // unreadable horizontal smears. Keeping colScale at 1 and letting
+  // rowScale alone carry the "boldness" is what keeps strokes reading as
+  // solid, legible blocks instead of thin bars.
   // ---------------------------------------------------------------------
   const WEIGHT_SCALE = {"Tiny": 1, "Regular": 2, "Bold": 4};
-  const WEIGHT_COL_EXTRA = {"Tiny": 1, "Regular": 1, "Bold": 1.5};
   const DENSITY_ROW_STEP = {"Dense": 1, "Loose": 2};
   const WIDTH_COL_STEP = {"Narrow": 1, "Medium": 2, "Wide": 3, "Very Wide": 4};
 
@@ -100,7 +99,7 @@
     const rowStep = DENSITY_ROW_STEP[density] || 1;
     const colStep = WIDTH_COL_STEP[width] || 1;
     const rowScale = WEIGHT_SCALE[weight] || 1;
-    const colScale = Math.max(1, Math.round(rowScale * (WEIGHT_COL_EXTRA[weight] ?? 1)));
+    const colScale = 1;
     const scaledGap = gap * colScale;
 
     const cellSet = new Set();
