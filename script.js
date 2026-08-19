@@ -94,12 +94,20 @@
   // Full ("real") layout: lays text out on a grid of on (col,row) cells,
   // applying weight/density/width — including the NxN block explosion for
   // weight. This is what the actual exported MIDI is built from.
+  //
+  // colScale mirrors rowScale so each "on" pixel becomes a true square
+  // block (e.g. 4x4 for Bold) instead of a block that's only thick
+  // vertically. Without this, strokes stay 1 column wide no matter the
+  // weight setting, which is what made exported clips read as thin even
+  // at "Bold" — the live preview already fakes this square look via CSS
+  // cell sizing, so this keeps the real export matching what the preview
+  // promises.
   // ---------------------------------------------------------------------
   function layoutCellsFull(text, weight, density, width, gap){
     const rowStep = DENSITY_ROW_STEP[density] || 1;
     const colStep = WIDTH_COL_STEP[width] || 1;
     const rowScale = WEIGHT_SCALE[weight] || 1;
-    const colScale = 1;
+    const colScale = rowScale;
     const scaledGap = gap * colScale;
 
     const cellSet = new Set();
